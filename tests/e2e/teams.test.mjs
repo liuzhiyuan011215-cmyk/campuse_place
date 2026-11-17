@@ -83,6 +83,20 @@ describe("중국어(유학생) 모드", () => {
       await page.waitForSelector("article.card");
       assert.equal(await resultCount(page), expected);
     }));
+
+  test("랜덤 추천 대화상자가 열리고 다시 뽑기·상세 보기가 동작한다", () =>
+    run(async (page) => {
+      await page.getByRole("button", { name: "랜덤 추천" }).click();
+      const dialog = page.getByRole("dialog", { name: /오늘의 랜덤 추천/ });
+      await dialog.waitFor();
+      const first = await dialog.locator(".pickName").innerText();
+      await dialog.getByRole("button", { name: "다시 뽑기" }).click();
+      const second = await dialog.locator(".pickName").innerText();
+      assert.notEqual(second, first);
+      await dialog.getByRole("button", { name: "자세히 보기" }).click();
+      await page.locator("dialog.placeDialog[open]").waitFor();
+      assert.equal(await page.locator("dialog.placeDialog #dialogTitle").innerText(), second);
+    }));
 });
 
 describe("교통여지도: 음식 종류와 리뷰 키워드", () => {

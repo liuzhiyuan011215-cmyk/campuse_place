@@ -1,4 +1,4 @@
-import { ListFilter, RotateCcw, Star } from "lucide-react";
+import { Dices, ListFilter, RotateCcw, Star } from "lucide-react";
 import { foodPhotoUrl } from "../lib/cover";
 import { useLang } from "../lib/i18n";
 import type { CategoryOption } from "../lib/places";
@@ -23,6 +23,7 @@ interface Props {
   hasZones: boolean;
   hasIntl: boolean;
   hasSolo: boolean;
+  onRandomPick: () => void;
 }
 
 const FOOD_CATEGORIES = ["", "식당", "카페"];
@@ -169,6 +170,10 @@ export function Controls(props: Props) {
               ))}
             </select>
           </div>
+          <button type="button" className="button small" onClick={props.onRandomPick} disabled={props.visibleCount === 0}>
+            <Dices size={15} aria-hidden="true" />
+            {t.randomPick}
+          </button>
           <button type="button" className="button small" onClick={props.onReset} disabled={!props.filtersActive}>
             <RotateCcw size={15} aria-hidden="true" />
             {t.reset}

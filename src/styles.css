@@ -589,6 +589,23 @@ select {
   overflow: auto;
 }
 .dialog.authDialog { width: min(440px, calc(100vw - 24px)); }
+.pickBody { display: grid; gap: 10px; }
+.pickHero {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--cat-bg);
+  color: var(--cat-fg);
+  display: grid;
+  place-items: center;
+}
+.pickImage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.pickHero .badge { position: absolute; left: 10px; top: 10px; background: var(--surface); box-shadow: 0 1px 3px var(--shadow); }
+.pickName { font-size: 1.25rem; line-height: 1.3; font-weight: 800; }
+.pickLine { color: var(--text); font-size: 0.94rem; }
+.pickActions { display: flex; gap: 8px; margin-top: 6px; }
+.pickActions .button { flex: 1; }
 .dialog::backdrop { background: var(--scrim); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 .dialogBody { padding: 0 20px 20px; }
 .dialogHead {

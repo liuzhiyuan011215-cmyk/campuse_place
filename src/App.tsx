@@ -10,6 +10,7 @@ import { PlaceCard } from "./components/PlaceCard";
 import { PlaceDialog } from "./components/PlaceDialog";
 import { PlaceMap } from "./components/PlaceMap";
 import { PopularStrip } from "./components/PopularStrip";
+import { RandomPickDialog } from "./components/RandomPickDialog";
 import { RoomFinder } from "./components/RoomFinder";
 import { SideList } from "./components/SideList";
 import { SubmitDialog, type SubmitTarget } from "./components/SubmitDialog";
@@ -39,6 +40,7 @@ import { SessionProvider, useSession } from "./lib/session";
 import { submissionToPlace } from "./lib/submissionPlace";
 import { supabaseEnabled } from "./lib/supabase";
 import { filtersFromSearch, filtersToSearch, viewFromSearch, type View } from "./lib/urlState";
+import { pickRandomPlace } from "./lib/randomPick";
 import { useGlassSheen } from "./lib/useGlassSheen";
 import { DEFAULT_FILTERS, type Filters } from "./types";
 
@@ -72,6 +74,7 @@ function Main() {
   });
   const [view, setView] = useState<View>(() => viewFromSearch(location.search));
   const [selectedId, setSelectedId] = useState<string | null>(parseHash);
+  const [pickedId, setPickedId] = useState<string | null>(null);
   const [focusId, setFocusId] = useState<string | null>(null);
   const [submitTarget, setSubmitTarget] = useState<SubmitTarget | null>(null);
   const [now, setNow] = useState(() => new Date());
@@ -217,6 +220,8 @@ function Main() {
   const canShowMap = mapEnabled && Boolean(places?.some(isLocated));
   const currentView: View = view === "map" && !canShowMap ? "list" : view === "admin" && !supabaseEnabled ? "list" : view;
   const selected = places?.find((place) => place.id === selectedId) ?? null;
+  const picked = places?.find((place) => place.id === pickedId) ?? null;
+  const reroll = () => setPickedId((prev) => pickRandomPlace(visible, filters.category, prev ?? undefined)?.id ?? null);
   const favoriteCount = places ? places.filter((p) => favoriteIds.has(p.id)).length : 0;
   const openableCount = places ? places.filter((p) => openStatus(p.schedule, now) !== "unknown").length : 0;
   const tileCounts = useMemo(
@@ -328,6 +333,7 @@ function Main() {
             hasZones={places.some((p) => p.zone)}
             hasIntl={places.some(isIntl)}
             hasSolo={places.some(isSolo)}
+            onRandomPick={reroll}
           />
         )}
 
@@ -479,6 +485,18 @@ function Main() {
           changeView("admin");
         }}
       />
+      {picked && (
+        <RandomPickDialog
+          place={picked}
+          canReroll={(filters.category || !visible.some((p) => p.isFood) ? visible : visible.filter((p) => p.isFood)).length > 1}
+          onReroll={reroll}
+          onOpenDetail={(id) => {
+            setPickedId(null);
+            openPlace(id);
+          }}
+          onClose={() => setPickedId(null)}
+        />
+      )}
       {submitTarget && <SubmitDialog target={submitTarget} onClose={() => setSubmitTarget(null)} />}
     </div>
   );
